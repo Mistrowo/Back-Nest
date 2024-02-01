@@ -1,19 +1,16 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class ServicioTabla {
-
+export class UsuarioTabla {
   @PrimaryGeneratedColumn()
   id: number;
-
 
   @Column('varchar', { length: 50 })
   name: string;
 
-  
   @Column('varchar', { length: 50 })
-  description: string;
+  contrasena: string;
 
-  @Column('int')
-  stock: number;
+  @Column('varchar', { length: 50 })
+  correo: string; // Corregido a string
 }

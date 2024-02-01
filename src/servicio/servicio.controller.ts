@@ -8,39 +8,40 @@ export class ServicioController {
   constructor(private readonly servicioService: ServicioService) { }
 
   @Get()
-  getAllProducts(): Interfaz[] {
-    return this.servicioService.getAll();
-  }
-
-  @Get(':id')
-  async find(@Param('id', ParseIntPipe) id: number) {
-    return this.servicioService.getId(id);
-  }
-
-  @Post()
-@HttpCode(HttpStatus.NO_CONTENT)
-createProduct(@Body() servicioDto: ServicioDto) {
-  const id = this.servicioService.generateUniqueId();
-
-  this.servicioService.insert({
-    id,
-    name: servicioDto.name,
-    description: servicioDto.description,
-   
-  });
+async getAllProducts() {
+  return await this.servicioService.getAll();
 }
-  @Put(':id')
+
+@Get(':id')
+async find(@Param('id', ParseIntPipe) id: number) {
+  return await this.servicioService.getId(id);
+}
+
+
+@Post()
+@HttpCode(HttpStatus.CREATED) 
+async createProduct(@Body() servicioDto: ServicioDto) {
+  await this.servicioService.insert(servicioDto);
+}
+
+
+
+@Put(':id')
 async update(
   @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number, 
-  @Body() body,
+  @Body() body: ServicioDto,
 ) {
-  return this.servicioService.update(id, body);
+  return await this.servicioService.update(id, body);
 }
 
-  @Delete(':id')
-  @HttpCode(204)
-  deleteProduct(@Param('id') id: number) {
-    this.servicioService.delete(id);
-  }
+
+@Delete(':id')
+@HttpCode(HttpStatus.NO_CONTENT)
+async deleteProduct(@Param('id') id: number) {
+  await this.servicioService.delete(id);
+}
+
+
+
 
 }

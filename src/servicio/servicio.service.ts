@@ -1,59 +1,61 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Interfaz } from './interfaces/interfaz/interfaz.interface';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm'
+import { ServicioTabla } from './servicio.entity';
+import { ServicioDto } from './dto/servicio.dto/servicio.dto';
+
 @Injectable()
 export class ServicioService {
 
-  private servicio: Interfaz[] = [
-    {
-      id: 1,
-      name: 'Servicio Prueba',
-      description: 'Probando weas'
-    },
-    {
-      id: 2,
-      name: 'Servicio temrinar bg3',
-      description: 'Matar al cerebro gigante'
-    },
-    {
-      id: 3,
-      name: 'Servicio Irme a casa',
-      description: 'Me quiero ir a la casa'
-    }
-  ];
 
-  getAll(): Interfaz[] {
-    return this.servicio;
-  }
+  constructor(
+    @InjectRepository(ServicioTabla)
+    private servicioRepository: Repository<ServicioTabla>,
+  ) {}
 
-  insert(servicio: Interfaz) {
-    this.servicio = [...this.servicio, servicio];
-  }
+ 
+  getAll() {
+    return this.servicioRepository.find();
+}
 
-  update(id: number, productData: Interfaz): Interfaz {
-    let product = this.servicio.find(p => p.id === id);
-    if (product) {
-      product = { ...product, ...productData };
-    }
-    return product;
-  }
+async insert(body: ServicioDto) {
+  const product = this.servicioRepository.create(body);
+  await this.servicioRepository.save(product);
+  return product;
+  
+}
 
-  delete(id: number) {
-    this.servicio = this.servicio.filter(p => p.id !== id);
-  }
 
-  getId(id: number): Interfaz {
-    const product = this.servicio.find(item => item.id == id);
-    if (product) {
-      return product;
-    } else {
-      throw new NotFoundException(`No encontramos el producto ${id}`);
-    }
+async update(id: number, body: any) {
+  const userProduct = {
+    id,
+    ...body,
   }
+  const product = await this.servicioRepository.preload(userProduct);
+  if(product) {
+    return this.servicioRepository.save(product);
+  }
+  throw new NotFoundException(`No se encuentra el producto ${id}`);
+}
 
-  // Método para generar un ID único
-  generateUniqueId(): number {
-    const maxId = this.servicio.reduce((acc, cur) => cur.id > acc ? cur.id : acc, 0);
-    return maxId + 1;
+async delete(id: number) {
+  const product = await this.servicioRepository.findOne({ where: { id } });
+  if (product) {
+    return this.servicioRepository.remove(product);
   }
+  throw new NotFoundException(`No se encuentra el producto ${id}`);
+}
+
+getId(id: number): Promise<ServicioTabla> {
+    return this.servicioRepository.findOne({ where: { id } });
+}
+
+
+  
+
+
+
+
 }

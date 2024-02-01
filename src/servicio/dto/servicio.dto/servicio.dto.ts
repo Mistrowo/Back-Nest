@@ -1,17 +1,15 @@
-
-
-import { IsInt, IsString,Min } from "class-validator";
+import { IsString, IsInt, Length, Min } from 'class-validator';
 
 export class ServicioDto {
-  @IsString({
-    message: "El campo nombre debe de ser un String"
-  })
+  @IsString()
+  @Length(1, 50)
   name: string;
 
   @IsString()
+  @Length(1, 50)
   description: string;
 
-  @IsInt({ message: 'El stock debe de ser un número entero' })
-  @Min(0, { message: 'El stock debe ser 0 o más'})
+  @IsInt()
+  @Min(0)
   stock: number;
 }
